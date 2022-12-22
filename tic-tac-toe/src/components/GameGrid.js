@@ -3,10 +3,11 @@ import '../App.css';
 import CardSlot from './CardSlot';
 
 import PlayerCard from './PlayerCard';
-import { Grid, Box, DialogContent } from '@mui/material';
+import { Grid, Box, DialogContent, CircularProgress, Backdrop, Button, Modal } from '@mui/material';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { setPosition, checkWinner, mossaComputer } from '../utils/MossaTris';
+
 const GameGrid = (props) => {
 
     const [isOver, setIsOver] = useState(false);
@@ -80,14 +81,29 @@ const GameGrid = (props) => {
     const [dialog, setDialog] = useState(true);
     const [scoreX, setScoreX] = useState(0);
     const [scoreO, setScoreO] = useState(0);
+    const [open, setOpen] = useState(false);
+    const [winner, setWinner] = useState('');
+    const handleCloseBackdrop = () => {
+        setOpen(false);
+    };
+    const handleToggle = (winner) => {
+        console.log('ENTER HANDLETOGGLE');
+        setWinner(winner);
+        setOpen(!open);
 
+    };
+    const handleToggleClose = () => {
+        console.log('ENTER HANDLETOGGLECLOSE');
+        setOpen(!open);
+        reset();
+    };
 
     useEffect(() => {
         //console.log(' 3 ENTRO NELLO USE EFFECT GRID');
-        console.log('ICON X', iconColorX);
-        console.log('ICON O', iconColorO);
-        console.log('SCORE O', scoreO);
-        console.log('SCORE X', scoreX);
+        // console.log('ICON X', iconColorX);
+        // console.log('ICON O', iconColorO);
+        // console.log('SCORE O', scoreO);
+        // console.log('SCORE X', scoreX);
 
     }, [iconColorO, iconColorX, scoreO, scoreX]);
 
@@ -245,8 +261,56 @@ const GameGrid = (props) => {
                     </Grid>
                 </div>
 
+                <Backdrop
+                    // sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={open}
+                    onClick={handleToggleClose}
+                >
+                    <div>
+                        <h1 style={{ color: '#fcf905', fontSize: '45px' }}>{winner}</h1>
+                    </div>
+                    <div>
+                        {/* <Button onClick={handleToggleClose} sx={{ border: '1px solid #07f52f', color: '#07f52f' }}>Close</Button> */}
+                    </div>
+                    {/* <CircularProgress color="inherit" />  */}
+                </Backdrop>*
+
             </>
         )
+    }
+    // const style = {
+    //     position: 'absolute',
+    //     top: '50%',
+    //     left: '50%',
+    //     transform: 'translate(-50%, -50%)',
+    //     width: 400,
+    //     bgcolor: 'background.paper',
+    //     border: '2px solid #000',
+    //     boxShadow: 24,
+    //     p: 4,
+    // };
+
+    const modal = () => {
+        return (
+
+            <Modal
+                open={open}
+                onClose={handleToggleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={{ backgroundColor: 'grey' }}>
+                    <div>
+                        <h1 style={{ color: '#07f52f' }}>{winner}</h1>
+                    </div>
+                </Box>
+                <div>
+                    <Button onClick={handleToggleClose} sx={{ border: '1px solid #07f52f', color: '#07f52f' }}>Close</Button>
+                </div>
+            </Modal>
+
+        )
+
     }
 
     const mOver = (event, value, index) => {
@@ -271,13 +335,7 @@ const GameGrid = (props) => {
         } else {
             res = checkWinner(-3, grigliaDiGioco);
         }
-        if (p1) {
-            setP1(false);
-            setP2(true);
-        } else {
-            setP1(true);
-            setP2(false);
-        }
+
         if (turn[index] === 'x') {
             //console.log('ENTRO NELL IF PER VEDERE SE TURN.INDEX E X ')
             setTurn((turn) => {
@@ -302,6 +360,13 @@ const GameGrid = (props) => {
                 return turn;
             });
         }
+        if (p1) {
+            setP1(false);
+            setP2(true);
+        } else {
+            setP1(true);
+            setP2(false);
+        }
         if (res.sum === 3) {
             setCardColors((cardColors) => {
                 for (let key of res.diagonal) {
@@ -311,10 +376,11 @@ const GameGrid = (props) => {
             })
             setIconColorX('#07f52f');
             setIconColorO('red');
-            setTimeout(() => {
-                reset();
-                props.player.symbol === 'x' ? showWinner(props.player.playerFullName + ' WINS', 'x') : showWinner('COMPUTER WINS', 'x');
-            }, 300);
+            props.player.symbol === 'x' ? showWinner(props.player.playerFullName + ' WINS', 'x') : showWinner('COMPUTER WINS', 'x');
+            // setTimeout(() => {
+            //     reset();
+            //     props.player.symbol === 'x' ? showWinner(props.player.playerFullName + ' WINS', 'x') : showWinner('COMPUTER WINS', 'x');
+            // }, 300);
         } else if (res.sum === -3) {
             setCardColors((cardColors) => {
                 for (let key of res.diagonal) {
@@ -324,19 +390,22 @@ const GameGrid = (props) => {
             })
             setIconColorO('#07f52f');
             setIconColorX('red');
-            setTimeout(() => {
-                reset();
-                props.player.symbol === 'o' ? showWinner(props.player.playerFullName + ' WINS', 'o') : showWinner('COMPUTER WINS', 'o');
-            }, 300);
+            props.player.symbol === 'o' ? showWinner(props.player.playerFullName + ' WINS', 'o') : showWinner('COMPUTER WINS', 'o');
+            // setTimeout(() => {
+            //     reset();
+            //     props.player.symbol === 'o' ? showWinner(props.player.playerFullName + ' WINS', 'o') : showWinner('COMPUTER WINS', 'o');
+            // }, 300);
         }
     }
 
     const showWinner = (winner, symbol) => {
-        alert(winner);
+        //alert(winner);
+        alertWinner(winner);
         symbol === 'x' ? setScoreX(scoreX + 1) : setScoreO(scoreO + 1);
     }
 
     const reset = () => {
+        console.log('RESET CALLED');
         setTurn((turn) => {
             for (let key in turn) {
                 turn[key] = val;
@@ -375,6 +444,10 @@ const GameGrid = (props) => {
         });
     }
 
+    const alertWinner = (winner) => {
+        handleToggle(winner);
+    }
+
     const onHover = (param) => {
         param ? setColor('#4e4e59') : setColor('#282830');
     }
@@ -383,6 +456,7 @@ const GameGrid = (props) => {
         <>
             {beginningDialog()}
             {play()}
+            {/* {modal()} */}
         </>
     )
 }

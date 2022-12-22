@@ -72,8 +72,11 @@ const checkWinner = (result, matrix) => {
     };
 }
 
-const mossaComputer = (posizioneAvversario, griglia) => {
+const mossaComputer = (simbolo, griglia) => {
+    let s = simbolo === 'x' ? 'o' : 'x';
+    for (let key of griglia) {
 
+    }
 }
 
 export { setPosition, checkWinner, mossaComputer };
